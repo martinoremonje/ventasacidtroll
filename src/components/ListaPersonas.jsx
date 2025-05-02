@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 import acidtrollfondo from '../assets/acidtrollfondo.png';
@@ -19,18 +19,19 @@ function ListaPersonas() {
     return storedPersonas ? JSON.parse(storedPersonas) : [];
   });
   const [nuevoNombre, setNuevoNombre] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const personRefs = useRef({});
 
   useEffect(() => {
-    if (personas.length > 0) {
-      localStorage.setItem('listaPersonas', JSON.stringify(personas));
-    } else if (localStorage.getItem('listaPersonas')) {
-      localStorage.removeItem('listaPersonas');
-    }
+    const sortedPersonas = [...personas].sort((a, b) =>
+      a.nombre.localeCompare(b.nombre)
+    );
+    localStorage.setItem('listaPersonas', JSON.stringify(sortedPersonas));
   }, [personas]);
 
   const agregarPersona = () => {
     if (nuevoNombre.trim()) {
-      setPersonas([...personas, {
+      const nuevaPersona = {
         id: uuidv4(),
         nombre: nuevoNombre.toUpperCase(),
         bebidas: 0,
@@ -40,7 +41,11 @@ function ListaPersonas() {
         chocman: 0,
         choripanes: 0,
         papasFritas: 0,
-      }]);
+      };
+      setPersonas(prevPersonas => {
+        const updatedPersonas = [...prevPersonas, nuevaPersona];
+        return updatedPersonas;
+      });
       setNuevoNombre('');
     }
   };
@@ -69,6 +74,23 @@ function ListaPersonas() {
     setPersonas(personas.filter(persona => persona.id !== idPersona));
   };
 
+  const sortedPersonasForRender = [...personas].sort((a, b) =>
+    a.nombre.localeCompare(b.nombre)
+  );
+
+  const handleSearch = () => {
+    const foundPerson = sortedPersonasForRender.find(persona =>
+      persona.nombre.includes(searchTerm.toUpperCase())
+    );
+
+    if (foundPerson && personRefs.current[foundPerson.id]) {
+      personRefs.current[foundPerson.id].scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+
   return (
     <div
       className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4 sm:p-6"
@@ -93,14 +115,34 @@ function ListaPersonas() {
           </button>
         </div>
 
+        <div className="mb-4 flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Buscar persona..."
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={handleSearch}
+          >
+            Buscar
+          </button>
+        </div>
+
         {personas.length === 0 && !localStorage.getItem('listaPersonas') ? (
           <p className="text-gray-700">No hay personas en la lista.</p>
         ) : personas.length === 0 && localStorage.getItem('listaPersonas') ? (
           <p className="text-gray-700">La lista está vacía.</p>
         ) : (
           <ul className="space-y-4">
-            {personas.map(persona => (
-              <li key={persona.id} className="bg-gray-100 bg-opacity-70 p-6 sm:p-8 border rounded-md">
+            {sortedPersonasForRender.map(persona => (
+              <li
+                key={persona.id}
+                className="bg-gray-100 bg-opacity-70 p-6 sm:p-8 border rounded-md"
+                ref={el => (personRefs.current[persona.id] = el)}
+              >
                 <div className="flex justify-between items-center mb-4 text-gray-800">
                   <h3 className="font-semibold text-lg sm:text-xl">{persona.nombre}</h3>
                   <button
@@ -110,7 +152,8 @@ function ListaPersonas() {
                     Eliminar
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-y-4 md:grid-cols-3 lg:grid-cols-4"> {/* Dos columnas en pantallas pequeñas (por defecto) */}
+                {/* ... (resto del código de la persona) ... */}
+                <div className="grid grid-cols-2 gap-y-4 md:grid-cols-3 lg:grid-cols-4">
                   <div className="border rounded-md p-3 flex flex-col items-center">
                     <span className="text-sm sm:text-base mb-1">Bebidas</span>
                     <div className="flex">
