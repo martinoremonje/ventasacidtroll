@@ -41,6 +41,7 @@ function ListaPersonas() {
         chocman: 0,
         choripanes: 0,
         papasFritas: 0,
+        pagado: false, // Nuevo estado para controlar si está pagado
       };
       setPersonas(prevPersonas => {
         const updatedPersonas = [...prevPersonas, nuevaPersona];
@@ -72,6 +73,12 @@ function ListaPersonas() {
 
   const eliminarPersona = (idPersona) => {
     setPersonas(personas.filter(persona => persona.id !== idPersona));
+  };
+
+  const togglePagado = (idPersona) => {
+    setPersonas(personas.map(persona =>
+      persona.id === idPersona ? { ...persona, pagado: !persona.pagado } : persona
+    ));
   };
 
   const sortedPersonasForRender = [...personas].sort((a, b) =>
@@ -152,8 +159,8 @@ function ListaPersonas() {
                     Eliminar
                   </button>
                 </div>
-                {/* ... (resto del código de la persona) ... */}
                 <div className="grid grid-cols-2 gap-y-4 md:grid-cols-3 lg:grid-cols-4">
+                  {/* ... (resto del código de los contadores) ... */}
                   <div className="border rounded-md p-3 flex flex-col items-center">
                     <span className="text-sm sm:text-base mb-1">Bebidas</span>
                     <div className="flex">
@@ -212,6 +219,20 @@ function ListaPersonas() {
                   </div>
                   <div className="mt-4 text-sm sm:text-base font-semibold text-gray-900 col-span-2 md:col-span-3 lg:col-span-4">
                     Total: ${calcularTotal(persona)}
+                  </div>
+                  <div className="col-span-2 md:col-span-1 lg:col-span-1 flex items-center justify-end">
+                    <label className="inline-flex items-center cursor-pointer">
+                    <span className="mr-2 text-gray-700 text-sm sm:text-base">
+                        {persona.pagado ? 'Pagado' : 'No Pagado'}
+                      </span>
+                      <input
+                        type="checkbox"
+                        className="form-checkbox h-5 w-5 text-green-500 focus:outline-none focus:shadow-outline rounded"
+                        checked={persona.pagado}
+                        onChange={() => togglePagado(persona.id)}
+                      />
+                      
+                    </label>
                   </div>
                 </div>
               </li>
