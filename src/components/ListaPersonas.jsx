@@ -41,7 +41,7 @@ function ListaPersonas() {
         chocman: 0,
         choripanes: 0,
         papasFritas: 0,
-        pagado: false, // Nuevo estado para controlar si está pagado
+        pagado: false,
       };
       setPersonas(prevPersonas => {
         const updatedPersonas = [...prevPersonas, nuevaPersona];
@@ -81,12 +81,30 @@ function ListaPersonas() {
     ));
   };
 
-  const sortedPersonasForRender = [...personas].sort((a, b) =>
-    a.nombre.localeCompare(b.nombre)
-  );
+  // Nueva función para resetear todas las compras a cero
+  const resetearTodasLasCompras = () => {
+    // Preguntar confirmación al usuario antes de resetear
+    const confirmacion = window.confirm("¿Estás seguro de que deseas dejar en cero todas las compras de todos los clientes? Esta acción es irreversible.");
+    if (confirmacion) {
+      setPersonas(personas.map(persona => ({
+        ...persona,
+        bebidas: 0,
+        cervezas: 0,
+        cervezasGrandes: 0,
+        energeticas: 0,
+        chocman: 0,
+        choripanes: 0,
+        papasFritas: 0,
+      })));
+    }
+  };
+
+  const filteredPersonas = personas.filter(persona =>
+    persona.nombre.toUpperCase().includes(searchTerm.toUpperCase())
+  ).sort((a, b) => a.nombre.localeCompare(b.nombre));
 
   const handleSearch = () => {
-    const foundPerson = sortedPersonasForRender.find(persona =>
+    const foundPerson = filteredPersonas.find(persona =>
       persona.nombre.includes(searchTerm.toUpperCase())
     );
 
@@ -122,7 +140,7 @@ function ListaPersonas() {
           </button>
         </div>
 
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-col sm:flex-row items-center gap-2">
           <input
             type="text"
             placeholder="Buscar persona..."
@@ -138,13 +156,24 @@ function ListaPersonas() {
           </button>
         </div>
 
+        {/* Nuevo botón para resetear todas las compras */}
+        <div className="mb-4 text-center">
+          <button
+            className="bg-red-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={resetearTodasLasCompras}
+          >
+            Resetear Todas las Compras
+          </button>
+        </div>
+        <hr className="my-4" />
+
         {personas.length === 0 && !localStorage.getItem('listaPersonas') ? (
           <p className="text-gray-700">No hay personas en la lista.</p>
         ) : personas.length === 0 && localStorage.getItem('listaPersonas') ? (
           <p className="text-gray-700">La lista está vacía.</p>
         ) : (
           <ul className="space-y-4">
-            {sortedPersonasForRender.map(persona => (
+            {filteredPersonas.map(persona => (
               <li
                 key={persona.id}
                 className="bg-gray-100 bg-opacity-70 p-6 sm:p-8 border rounded-md"
@@ -160,7 +189,6 @@ function ListaPersonas() {
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-y-4 md:grid-cols-3 lg:grid-cols-4">
-                  {/* ... (resto del código de los contadores) ... */}
                   <div className="border rounded-md p-3 flex flex-col items-center">
                     <span className="text-sm sm:text-base mb-1">Bebidas</span>
                     <div className="flex">
@@ -222,7 +250,7 @@ function ListaPersonas() {
                   </div>
                   <div className="col-span-2 md:col-span-1 lg:col-span-1 flex items-center justify-end">
                     <label className="inline-flex items-center cursor-pointer">
-                    <span className="mr-2 text-gray-700 text-sm sm:text-base">
+                      <span className="mr-2 text-gray-700 text-sm sm:text-base">
                         {persona.pagado ? 'Pagado' : 'No Pagado'}
                       </span>
                       <input
@@ -231,7 +259,6 @@ function ListaPersonas() {
                         checked={persona.pagado}
                         onChange={() => togglePagado(persona.id)}
                       />
-                      
                     </label>
                   </div>
                 </div>
