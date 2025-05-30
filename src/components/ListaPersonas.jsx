@@ -12,6 +12,8 @@ function ListaPersonas() {
     chocman: 500,
     choripanes: 1500,
     papasFritas: 1000,
+    cafe: 700, // Added cafe
+    beerwolfs: 3000, // Added beerwolfs
   };
 
   const [personas, setPersonas] = useState(() => {
@@ -41,6 +43,8 @@ function ListaPersonas() {
         chocman: 0,
         choripanes: 0,
         papasFritas: 0,
+        cafe: 0, // Initialized cafe for new persons
+        beerwolfs: 0, // Initialized beerwolfs for new persons
         pagado: false,
       };
       setPersonas(prevPersonas => {
@@ -67,7 +71,9 @@ function ListaPersonas() {
       persona.energeticas * precios.energeticas +
       persona.chocman * precios.chocman +
       persona.choripanes * precios.choripanes +
-      persona.papasFritas * precios.papasFritas
+      persona.papasFritas * precios.papasFritas +
+      persona.cafe * precios.cafe + // Added cafe to total calculation
+      persona.beerwolfs * precios.beerwolfs // Added beerwolfs to total calculation
     );
   };
 
@@ -95,6 +101,8 @@ function ListaPersonas() {
         chocman: 0,
         choripanes: 0,
         papasFritas: 0,
+        cafe: 0, // Reset cafe to 0
+        beerwolfs: 0, // Reset beerwolfs to 0
       })));
     }
   };
@@ -245,6 +253,25 @@ function ListaPersonas() {
                       <button onClick={() => actualizarCantidad(persona.id, 'papasFritas', -1)} className="text-red-500 hover:text-red-700 focus:outline-none text-sm sm:text-base"><FaMinus /></button>
                     </div>
                   </div>
+                  {/* New items: Cafe */}
+                  <div className="border rounded-md p-3 flex flex-col items-center">
+                    <span className="text-sm sm:text-base mb-1">Café</span>
+                    <div className="flex">
+                      <button onClick={() => actualizarCantidad(persona.id, 'cafe', 1)} className="text-green-500 hover:text-green-700 focus:outline-none text-sm sm:text-base"><FaPlus /></button>
+                      <span className="mx-2 text-gray-700 text-sm sm:text-base">{persona.cafe}</span>
+                      <button onClick={() => actualizarCantidad(persona.id, 'cafe', -1)} className="text-red-500 hover:text-red-700 focus:outline-none text-sm sm:text-base"><FaMinus /></button>
+                    </div>
+                  </div>
+                  {/* New items: Beerwolfs */}
+                  <div className="border rounded-md p-3 flex flex-col items-center">
+                    <span className="text-sm sm:text-base mb-1">Beerwolfs</span>
+                    <div className="flex">
+                      <button onClick={() => actualizarCantidad(persona.id, 'beerwolfs', 1)} className="text-green-500 hover:text-green-700 focus:outline-none text-sm sm:text-base"><FaPlus /></button>
+                      <span className="mx-2 text-gray-700 text-sm sm:text-base">{persona.beerwolfs}</span>
+                      <button onClick={() => actualizarCantidad(persona.id, 'beerwolfs', -1)} className="text-red-500 hover:text-red-700 focus:outline-none text-sm sm:text-base"><FaMinus /></button>
+                    </div>
+                  </div>
+
                   <div className="mt-4 text-sm sm:text-base font-semibold text-gray-900 col-span-2 md:col-span-3 lg:col-span-4">
                     Total: ${calcularTotal(persona)}
                   </div>
