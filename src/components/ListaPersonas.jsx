@@ -4,17 +4,18 @@ import { FaPlus, FaMinus } from 'react-icons/fa';
 import acidtrollfondo from '../assets/acidtrollfondo.png';
 
 function ListaPersonas() {
+  // 1. CORRECCIÓN: Nombres en plural para coincidir con el objeto persona
   const precios = {
     bebidas: 1500,
     vasoBebida: 1000,
     cervezas: 1000,
     cervezasGrandes: 2000,
     energeticas: 2000,
-    alfajor: 1200,
-    choripan: 1500,
+    alfajores: 1200,    // Antes era alfajor
+    choripanes: 1500,   // Antes era choripan
     papasFritas: 1000,
-    pisco2x: 5000, // Added cafe
-    completos: 2000, // Added beerwolfs
+    pisco2x: 5000,
+    completos: 2000,
   };
 
   const [personas, setPersonas] = useState(() => {
@@ -25,11 +26,8 @@ function ListaPersonas() {
   const [searchTerm, setSearchTerm] = useState('');
   const personRefs = useRef({});
 
-  useEffect(() => {
-    const sortedPersonas = [...personas].sort((a, b) =>
-      a.nombre.localeCompare(b.nombre)
-    );
-    localStorage.setItem('listaPersonas', JSON.stringify(sortedPersonas));
+ useEffect(() => {
+    localStorage.setItem('listaPersonas', JSON.stringify(personas));
   }, [personas]);
 
   const agregarPersona = () => {
@@ -65,20 +63,20 @@ function ListaPersonas() {
     ));
   };
 
-  const calcularTotal = (persona) => {
-  return (
-    persona.bebidas * precios.bebidas +
-    persona.vasoBebida * precios.vasoBebida +
-    persona.cervezas * precios.cervezas +
-    persona.cervezasGrandes * precios.cervezasGrandes +
-    persona.energeticas * precios.energeticas +
-    persona.alfajores * precios.alfajores +
-    persona.choripanes * precios.choripanes +
-    persona.papasFritas * precios.papasFritas +
-    persona.pisco2x * precios.pisco2x +
-    persona.completos * precios.completos
-  );
-};
+ const calcularTotal = (persona) => {
+    return (
+      (persona.bebidas * precios.bebidas) +
+      (persona.vasoBebida * precios.vasoBebida) +
+      (persona.cervezas * precios.cervezas) +
+      (persona.cervezasGrandes * precios.cervezasGrandes) +
+      (persona.energeticas * precios.energeticas) +
+      (persona.alfajores * (precios.alfajores || 0)) +
+      (persona.choripanes * (precios.choripanes || 0)) +
+      (persona.papasFritas * precios.papasFritas) +
+      (persona.pisco2x * precios.pisco2x) +
+      (persona.completos * precios.completos)
+    ) || 0;
+  };
 
   const eliminarPersona = (idPersona) => {
     setPersonas(personas.filter(persona => persona.id !== idPersona));
@@ -111,20 +109,14 @@ function ListaPersonas() {
     }
   };
 
-  const filteredPersonas = personas.filter(persona =>
-    persona.nombre.toUpperCase().includes(searchTerm.toUpperCase())
-  ).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  const filteredPersonas = personas
+    .filter(p => p.nombre.toUpperCase().includes(searchTerm.toUpperCase()))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
 
   const handleSearch = () => {
-    const foundPerson = filteredPersonas.find(persona =>
-      persona.nombre.includes(searchTerm.toUpperCase())
-    );
-
+    const foundPerson = filteredPersonas.find(p => p.nombre.includes(searchTerm.toUpperCase()));
     if (foundPerson && personRefs.current[foundPerson.id]) {
-      personRefs.current[foundPerson.id].scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+      personRefs.current[foundPerson.id].scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
